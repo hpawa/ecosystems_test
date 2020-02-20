@@ -72,8 +72,21 @@ class UserSchema(ma.ModelSchema):
 def all_users():
     response_object = {}
     if request.method == 'GET':
-        users = User.query.all()
-        response_object['users'] = UserSchema(many=True).dump(users)
+        users = User.query.filter()
+        #filters
+        username = request.args.get('username', None)
+        group = request.args.get('group', None)
+        role = request.args.get('role', None)
+        order_by = request.args.get('order_by', None)
+        if username:
+            users = users.filter(User.username.startswith(username))
+        if group:
+            users = users.filter_by(group_id=group)
+        if role:
+            users = users.filter_by(role_id=role)
+        if order_by:
+            users = users.order_by(order_by)
+        response_object['users'] = UserSchema(many=True).dump(users.all())
     if request.method == 'POST':
         new_user = UserSchema().load(request.get_json())
         db.session.add(new_user)

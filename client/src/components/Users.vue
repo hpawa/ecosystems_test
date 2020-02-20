@@ -99,6 +99,12 @@ export default {
   data() {
     return {
       message: "",
+      params: {
+        username: null,
+        group: null,
+        role: null,
+        order: null,        
+      },
       showMessage: false,
       users: [],
       groups: [],
@@ -119,8 +125,11 @@ export default {
   methods: {
     getUsers() {
       const path = "http://localhost:5000/users";
-      axios
-        .get(path)
+      axios({
+        method: 'GET',
+        url: path,
+        params: params
+      })        
         .then(res => {
           this.users = res.data.users;
         })
