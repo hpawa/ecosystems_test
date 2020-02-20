@@ -29,7 +29,8 @@ class Group(db.Model):
     __tablename__ = 'groups'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, unique=True, nullable=False)
-    role = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), default=1)
+    role = db.relationship('Role')
     dtcreate = db.Column(db.DateTime, default=datetime.now)
 
 
@@ -40,16 +41,27 @@ class User(db.Model):
     password = db.Column(db.String, nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey('groups.id'))
     group = db.relationship('Group')
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), default=1)
+    role = db.relationship('Role')
     dtcreate = db.Column(db.DateTime, default=datetime.now)
 
 
+class RoleSchema(ma.ModelSchema):
+    class Meta:
+        model = Role
+
+
 class GroupSchema(ma.ModelSchema):
+    role = fields.Nested(RoleSchema(only=('id', 'name')))
+
     class Meta:
         model = Group
+        unknown = INCLUDE
 
 
 class UserSchema(ma.ModelSchema):
     group = fields.Nested(GroupSchema(only=('id', 'name')))
+    role = fields.Nested(RoleSchema(only=('id', 'name')))
 
     class Meta:
         model = User
@@ -76,8 +88,8 @@ def single_user(user_id):
     user = User.query.filter_by(id=user_id)
     if request.method == 'GET':
         response_object = UserSchema().dump(user.first())
-    if request.method == 'PUT':        
-        post_data = request.get_json()        
+    if request.method == 'PUT':
+        post_data = request.get_json()
         user.update(post_data)
         db.session.commit()
         response_object['message'] = f'User {user.first().username} updated'
@@ -100,6 +112,20 @@ def all_groups():
         db.session.add(new_group)
         db.session.commit()
         response_object['message'] = 'Group created'
+    return jsonify(response_object)
+
+
+@app.route('/roles', methods=['GET', 'POST'])
+def all_roles():
+    response_object = {}
+    if request.method == 'GET':
+        roles = Role.query.all()
+        response_object['roles'] = RoleSchema(many=True).dump(roles)
+    if request.method == 'POST':
+        new_role = RoleSchema().load(request.get_json())
+        db.session.add(new_role)
+        db.session.commit()
+        response_object['message'] = f'Role {new_role.name} created'
     return jsonify(response_object)
 
 

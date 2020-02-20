@@ -24,7 +24,7 @@
               <td>{{ user.username }}</td>
               <td v-if="user.group !== null">{{ user.group.name }}</td>
               <td v-else></td>
-              <td>{{ user.role }}</td>
+              <td v-if="user.role !== null">{{ user.role.name }}</td>
               <td>
                 <button type="button" class="btn btn-warning btn-sm" @click="fillForm(user)" v-b-modal.user-modal>Update</button>
                 <button type="button" class="btn btn-danger btn-sm" @click="onDeleteUser(user)">Delete</button>
@@ -62,6 +62,14 @@
             required
           ></b-form-select>
         </b-form-group>
+        <b-form-group id="form-role-group" label="Role:" label-for="form-role-select">
+          <b-form-select
+            id="form-role-select"
+            v-model="userForm.role"
+            :options="rolesSelector"
+            required
+          ></b-form-select>
+        </b-form-group>
         <b-button type="submit" variant="primary">Submit</b-button>
         <b-button type="reset" variant="danger">Reset</b-button>
       </b-form>
@@ -82,12 +90,15 @@ export default {
       showMessage: false,
       users: [],
       groups: [],
+      roles: [],
       groupsSelector: [],
+      rolesSelector: [],
       userForm: {
         userID: null,
         username: "",
         password: "",
         group: null,
+        role: null,
         title: "",
         method: ""
       }
@@ -117,6 +128,18 @@ export default {
           console.error(error);
         });
     },
+    getRoles() {
+      const path = "http://localhost:5000/roles";
+      axios
+        .get(path)
+        .then(res => {
+          this.roles = res.data.roles;
+          this.getRolesSelector();
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
     getGroupsSelector() {        
         this.groupsSelector.push({'value': null, 'text': 'Select'});
         for (let i = 0; i < this.groups.length; i++) {
@@ -129,6 +152,20 @@ export default {
               }
             }            
             this.groupsSelector.push(option);
+          }          
+    },
+    getRolesSelector() {        
+        this.rolesSelector.push({'value': null, 'text': 'Select'});
+        for (let i = 0; i < this.roles.length; i++) {
+            let option = {};
+            for (let key in this.roles[i]) {                
+              if (key == "id") {
+                option["value"] = this.roles[i][key];
+              } else if (key == "name") {
+                option["text"] = this.roles[i][key];
+              }
+            }            
+            this.rolesSelector.push(option);
           }          
     },
     addUser(payload) {
@@ -179,7 +216,8 @@ export default {
     initForm() {
       this.userForm.username = "";
       this.userForm.password = "";
-      this.userForm.group = "";
+      this.userForm.group = null;
+      this.userForm.role = null;
       this.userForm.title = "Add User"
       this.userForm.method = "POST"
     },
@@ -215,7 +253,8 @@ export default {
   },
   created() {
     this.getUsers();
-    this.getGroups();    
+    this.getGroups();
+    this.getRoles();
   }
 };
 </script>

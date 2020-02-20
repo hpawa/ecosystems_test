@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: d16e45543be6
+Revision ID: bb63221aff61
 Revises: 
-Create Date: 2020-02-19 22:41:49.308598
+Create Date: 2020-02-20 15:43:05.569344
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd16e45543be6'
+revision = 'bb63221aff61'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,9 +28,9 @@ def upgrade():
     op.create_table('groups',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('role', sa.Integer(), nullable=True),
+    sa.Column('role_id', sa.Integer(), nullable=True),
     sa.Column('dtcreate', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['role'], ['roles.id'], ),
+    sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
@@ -39,8 +39,10 @@ def upgrade():
     sa.Column('username', sa.String(), nullable=False),
     sa.Column('password', sa.String(), nullable=False),
     sa.Column('group_id', sa.Integer(), nullable=True),
+    sa.Column('role_id', sa.Integer(), nullable=True),
     sa.Column('dtcreate', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ),
+    sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('username')
     )
