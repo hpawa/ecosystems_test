@@ -2,21 +2,39 @@
   <div class="container-fluid">
     <navbar></navbar>
     <div class="row">
-      <div class="col text-center">
+      <div class="col">
         <h1>Users</h1>
         <hr />
         <br />
         <br />
         <alert :message="message" v-if="showMessage"></alert>
-        <button
-          type="button"
-          class="btn btn-success btn-sm"
-          @click="initForm()"
-          v-b-modal.user-modal
-        >Add User</button>
+        <b-button variant="success" @click="initForm()" v-b-modal.user-modal>Add User</b-button>
+        <b-form inline class="float-right">
+          <label class="mr-sm-2" for="filter-group">Group</label>
+          <b-form-select
+            id="filter-group"
+            class="mr-2"
+            v-model="params.group"
+            :options="groupsSelector"
+            @change="getUsers()"
+          ></b-form-select>
+          <label class="mr-sm-2" for="filter-role">Role</label>          
+          <b-form-select
+            id="filter-role"
+            class="mr-2"            
+            v-model="params.role"
+            :options="rolesSelector"
+            @change="getUsers()"
+          ></b-form-select>
+          <b-form-input                        
+            placeholder="Search username"
+            v-model="params.username"
+            @input="getUsers()"
+          ></b-form-input>
+        </b-form>
         <br />
         <br />
-        <table class="table table-hover">
+        <table class="table table-hover text-center">
           <thead>
             <tr>
               <th scope="col">Username</th>
@@ -32,7 +50,7 @@
               <td v-else></td>
               <td v-if="user.role !== null">{{ user.role.name }}</td>
               <td>
-                <b-button-group size="sm" class="float-right">
+                <b-button-group class="float-right">
                   <b-button variant="warning" @click="fillForm(user)" v-b-modal.user-modal>Update</b-button>
                   <b-button variant="danger" @click="onDeleteUser(user)">Delete</b-button>
                 </b-button-group>
@@ -103,7 +121,7 @@ export default {
         username: null,
         group: null,
         role: null,
-        order: null,        
+        order: null
       },
       showMessage: false,
       users: [],
@@ -126,10 +144,10 @@ export default {
     getUsers() {
       const path = "http://localhost:5000/users";
       axios({
-        method: 'GET',
+        method: "GET",
         url: path,
-        params: params
-      })        
+        params: this.params
+      })
         .then(res => {
           this.users = res.data.users;
         })
@@ -246,6 +264,7 @@ export default {
       this.userForm.username = user.username;
       this.userForm.password = user.password;
       this.userForm.group = user.group.id;
+      this.userForm.role = user.role.id;
       this.userForm.title = "Update User";
       this.userForm.method = "PUT";
       this.userForm.userID = user.id;
@@ -256,7 +275,8 @@ export default {
       const payload = {
         username: this.userForm.username,
         password: this.userForm.username,
-        group_id: this.userForm.group
+        group_id: this.userForm.group,
+        role_id: this.userForm.role
       };
       if (this.userForm.method == "POST") {
         this.addUser(payload);

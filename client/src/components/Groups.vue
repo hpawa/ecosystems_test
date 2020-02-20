@@ -192,7 +192,8 @@ export default {
       evt.preventDefault();
       this.$refs.groupModal.hide();
       const payload = {
-        name: this.groupForm.name
+        name: this.groupForm.name,
+        role_id: this.groupForm.role
       };
       if (this.groupForm.method == "POST") {
         this.addGroup(payload);
