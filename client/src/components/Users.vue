@@ -32,17 +32,10 @@
               <td v-else></td>
               <td v-if="user.role !== null">{{ user.role.name }}</td>
               <td>
-                <button
-                  type="button"
-                  class="btn btn-warning btn-sm float-right"
-                  @click="fillForm(user)"
-                  v-b-modal.user-modal
-                >Update</button>
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm float-right"
-                  @click="onDeleteUser(user)"
-                >Delete</button>
+                <b-button-group size="sm" class="float-right">
+                  <b-button variant="warning" @click="fillForm(user)" v-b-modal.user-modal>Update</b-button>
+                  <b-button variant="danger" @click="onDeleteUser(user)">Delete</b-button>
+                </b-button-group>
               </td>
             </tr>
           </tbody>
@@ -85,8 +78,10 @@
             required
           ></b-form-select>
         </b-form-group>
-        <b-button type="submit" variant="primary">Submit</b-button>
-        <b-button type="reset" variant="danger">Reset</b-button>
+        <b-button-group class="float-right">
+          <b-button type="submit" variant="primary">Submit</b-button>
+          <b-button type="reset" variant="danger">Reset</b-button>
+        </b-button-group>
       </b-form>
     </b-modal>
   </div>

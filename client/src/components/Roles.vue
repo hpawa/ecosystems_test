@@ -27,17 +27,10 @@
             <tr v-for="(role, index) in roles" :key="index">
               <td>{{ role.name }}</td>
               <td>
-                <button
-                  type="button"
-                  class="btn btn-warning btn-sm float-right"
-                  @click="fillForm(role)"
-                  v-b-modal.role-modal
-                >Update</button>
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm float-right"
-                  @click="onDeleteRole(role)"
-                >Delete</button>
+                <b-button-group size="sm" class="float-right">
+                  <b-button variant="warning" @click="fillForm(role)" v-b-modal.role-modal>Update</b-button>
+                  <b-button variant="danger" @click="onDeleteRole(role)">Delete</b-button>
+                </b-button-group>
               </td>
             </tr>
           </tbody>
@@ -55,8 +48,10 @@
             placeholder="Enter name"
           ></b-form-input>
         </b-form-group>
-        <b-button type="submit" variant="primary">Submit</b-button>
-        <b-button type="reset" variant="danger">Reset</b-button>
+        <b-button-group class="float-right">
+          <b-button type="submit" variant="primary">Submit</b-button>
+          <b-button type="reset" variant="danger">Reset</b-button>
+        </b-button-group>
       </b-form>
     </b-modal>
   </div>

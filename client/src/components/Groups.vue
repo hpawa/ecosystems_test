@@ -7,25 +7,32 @@
         <hr />
         <br />
         <br />
-        <alert :message=message v-if="showMessage"></alert>
-        <button type="button" class="btn btn-success btn-sm" @click="initForm()" v-b-modal.group-modal>Add Group</button>
+        <alert :message="message" v-if="showMessage"></alert>
+        <button
+          type="button"
+          class="btn btn-success btn-sm"
+          @click="initForm()"
+          v-b-modal.group-modal
+        >Add Group</button>
         <br />
         <br />
         <table class="table table-hover">
           <thead>
             <tr>
-              <th scope="col">Name</th>              
+              <th scope="col">Name</th>
               <th scope="col">Role</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(group, index) in groups" :key="index">
-              <td>{{ group.name }}</td>              
+              <td>{{ group.name }}</td>
               <td>{{ group.role.name }}</td>
               <td>
-                <button type="button" class="btn btn-warning btn-sm float-right" @click="fillForm(group)" v-b-modal.group-modal>Update</button>
-                <button type="button" class="btn btn-danger btn-sm float-right" @click="onDeleteGroup(group)">Delete</button>
+                <b-button-group size="sm" class="float-right">
+                  <b-button variant="warning" @click="fillForm(group)" v-b-modal.group-modal>Update</b-button>
+                  <b-button variant="danger" @click="onDeleteGroup(group)">Delete</b-button>
+                </b-button-group>
               </td>
             </tr>
           </tbody>
@@ -41,7 +48,7 @@
             v-model="groupForm.name"
             required
             placeholder="Enter name"
-          ></b-form-input>        
+          ></b-form-input>
         </b-form-group>
         <b-form-group id="form-role-group" label="Role:" label-for="form-role-select">
           <b-form-select
@@ -51,8 +58,10 @@
             required
           ></b-form-select>
         </b-form-group>
-        <b-button type="submit" variant="primary">Submit</b-button>
-        <b-button type="reset" variant="danger">Reset</b-button>
+        <b-button-group class="float-right">
+          <b-button type="submit" variant="primary">Submit</b-button>
+          <b-button type="reset" variant="danger">Reset</b-button>
+        </b-button-group>
       </b-form>
     </b-modal>
   </div>
@@ -60,7 +69,7 @@
 
 <script>
 import axios from "axios";
-import Alert from './Alert.vue';
+import Alert from "./Alert.vue";
 import NavBar from "./NavBar.vue";
 export default {
   components: {
@@ -69,27 +78,27 @@ export default {
   },
   data() {
     return {
-      message: '',
-      showMessage: false,      
+      message: "",
+      showMessage: false,
       groups: [],
-      roles: [],      
+      roles: [],
       rolesSelector: [],
       groupForm: {
         groupID: null,
-        name: "",                
+        name: "",
         role: null,
         title: "",
         method: ""
       }
     };
   },
-  methods: {    
+  methods: {
     getGroups() {
       const path = "http://localhost:5000/groups";
       axios
         .get(path)
         .then(res => {
-          this.groups = res.data.groups;          
+          this.groups = res.data.groups;
         })
         .catch(error => {
           console.error(error);
@@ -106,20 +115,20 @@ export default {
         .catch(error => {
           console.error(error);
         });
-    },    
-    getRolesSelector() {        
-        this.rolesSelector.push({'value': null, 'text': 'Select'});
-        for (let i = 0; i < this.roles.length; i++) {
-            let option = {};
-            for (let key in this.roles[i]) {                
-              if (key == "id") {
-                option["value"] = this.roles[i][key];
-              } else if (key == "name") {
-                option["text"] = this.roles[i][key];
-              }
-            }            
-            this.rolesSelector.push(option);
-          }          
+    },
+    getRolesSelector() {
+      this.rolesSelector.push({ value: null, text: "Select" });
+      for (let i = 0; i < this.roles.length; i++) {
+        let option = {};
+        for (let key in this.roles[i]) {
+          if (key == "id") {
+            option["value"] = this.roles[i][key];
+          } else if (key == "name") {
+            option["text"] = this.roles[i][key];
+          }
+        }
+        this.rolesSelector.push(option);
+      }
     },
     addGroup(payload) {
       const path = "http://localhost:5000/groups";
@@ -163,33 +172,32 @@ export default {
           this.getGroups();
         });
     },
-    onDeleteGroup(group){
+    onDeleteGroup(group) {
       this.removeGroup(group.id);
     },
     initForm() {
-      this.groupForm.name = "";            
+      this.groupForm.name = "";
       this.groupForm.role = null;
-      this.groupForm.title = "Add Group"
-      this.groupForm.method = "POST"
+      this.groupForm.title = "Add Group";
+      this.groupForm.method = "POST";
     },
     fillForm(group) {
-      this.groupForm.name = group.name;      
+      this.groupForm.name = group.name;
       this.groupForm.role = group.role.id;
       this.groupForm.title = "Update Group";
       this.groupForm.method = "PUT";
-      this.groupForm.groupID = group.id
+      this.groupForm.groupID = group.id;
     },
     onSubmit(evt) {
       evt.preventDefault();
-      this.$refs.groupModal.hide();            
+      this.$refs.groupModal.hide();
       const payload = {
-        name: this.groupForm.name,
+        name: this.groupForm.name
       };
-      if (this.groupForm.method == 'POST') {
+      if (this.groupForm.method == "POST") {
         this.addGroup(payload);
-      }
-      else if (this.groupForm.method == 'PUT') {        
-        this.updateGroup(this.groupForm.groupID, payload)
+      } else if (this.groupForm.method == "PUT") {
+        this.updateGroup(this.groupForm.groupID, payload);
       }
       this.initForm();
     },
@@ -200,7 +208,7 @@ export default {
     }
   },
   created() {
-    this.getGroups();    
+    this.getGroups();
     this.getRoles();
   }
 };
