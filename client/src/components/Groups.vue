@@ -1,13 +1,14 @@
 <template>
-  <div class="container">
+  <div class="container-fluid">
+    <navbar></navbar>
     <div class="row">
-      <div class="col-sm-10">
+      <div class="col text-center">
         <h1>Groups</h1>
         <hr />
         <br />
         <br />
         <alert :message=message v-if="showMessage"></alert>
-        <button type="button" class="btn btn-success btn-sm" @click="initForm()" v-b-modal.user-modal>Add Group</button>
+        <button type="button" class="btn btn-success btn-sm" @click="initForm()" v-b-modal.group-modal>Add Group</button>
         <br />
         <br />
         <table class="table table-hover">
@@ -21,40 +22,32 @@
           <tbody>
             <tr v-for="(group, index) in groups" :key="index">
               <td>{{ group.name }}</td>              
+              <td>{{ group.role.name }}</td>
               <td>
-                <button type="button" class="btn btn-warning btn-sm" @click="fillForm(user)" v-b-modal.user-modal>Update</button>
-                <button type="button" class="btn btn-danger btn-sm" @click="onDeleteGroup(user)">Delete</button>
+                <button type="button" class="btn btn-warning btn-sm float-right" @click="fillForm(group)" v-b-modal.group-modal>Update</button>
+                <button type="button" class="btn btn-danger btn-sm float-right" @click="onDeleteGroup(group)">Delete</button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-    <b-modal ref="userModal" id="user-modal" :title="groupForm.title" hide-footer>
+    <b-modal ref="groupModal" id="group-modal" :title="groupForm.title" hide-footer>
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
-        <b-form-group id="form-username-group" label="Username:" label-for="form-username-input">
+        <b-form-group id="form-name-group" label="name:" label-for="form-name-input">
           <b-form-input
-            id="form-username-input"
+            id="form-name-input"
             type="text"
-            v-model="groupForm.username"
+            v-model="groupForm.name"
             required
-            placeholder="Enter username"
-          ></b-form-input>
+            placeholder="Enter name"
+          ></b-form-input>        
         </b-form-group>
-        <b-form-group id="form-password-group" label="Password:" label-for="form-password-input">
-          <b-form-input
-            id="form-password-input"
-            type="password"
-            v-model="groupForm.password"
-            required
-            placeholder="Enter password"
-          ></b-form-input>
-        </b-form-group>
-        <b-form-group id="form-group-group" label="Group:" label-for="form-group-select">
+        <b-form-group id="form-role-group" label="Role:" label-for="form-role-select">
           <b-form-select
-            id="form-group-select"
-            v-model="groupForm.group"
-            :options="groupsSelector"
+            id="form-role-select"
+            v-model="groupForm.role"
+            :options="rolesSelector"
             required
           ></b-form-select>
         </b-form-group>
@@ -68,36 +61,66 @@
 <script>
 import axios from "axios";
 import Alert from './Alert.vue';
+import NavBar from "./NavBar.vue";
 export default {
   components: {
     alert: Alert,
+    navbar: NavBar
   },
   data() {
     return {
       message: '',
       showMessage: false,      
-      groups: [],      
+      groups: [],
+      roles: [],      
+      rolesSelector: [],
       groupForm: {
         groupID: null,
-        name: "",
+        name: "",                
+        role: null,
         title: "",
         method: ""
       }
     };
   },
-  methods: {
+  methods: {    
     getGroups() {
       const path = "http://localhost:5000/groups";
       axios
         .get(path)
         .then(res => {
-          this.groups = res.data.groups;
-          this.getGroupsSelector();
+          this.groups = res.data.groups;          
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    getRoles() {
+      const path = "http://localhost:5000/roles";
+      axios
+        .get(path)
+        .then(res => {
+          this.roles = res.data.roles;
+          this.getRolesSelector();
         })
         .catch(error => {
           console.error(error);
         });
     },    
+    getRolesSelector() {        
+        this.rolesSelector.push({'value': null, 'text': 'Select'});
+        for (let i = 0; i < this.roles.length; i++) {
+            let option = {};
+            for (let key in this.roles[i]) {                
+              if (key == "id") {
+                option["value"] = this.roles[i][key];
+              } else if (key == "name") {
+                option["text"] = this.roles[i][key];
+              }
+            }            
+            this.rolesSelector.push(option);
+          }          
+    },
     addGroup(payload) {
       const path = "http://localhost:5000/groups";
       axios
@@ -127,7 +150,7 @@ export default {
         });
     },
     updateGroup(groupID, payload) {
-      const path = `http://localhost:5000/users/${groupID}`;
+      const path = `http://localhost:5000/groups/${groupID}`;
       axios
         .put(path, payload)
         .then(res => {
@@ -140,45 +163,45 @@ export default {
           this.getGroups();
         });
     },
-    onDeleteGroup(user){
-      this.removeGroup(user.id);
+    onDeleteGroup(group){
+      this.removeGroup(group.id);
     },
     initForm() {
-      this.groupForm.name = "";
+      this.groupForm.name = "";            
+      this.groupForm.role = null;
       this.groupForm.title = "Add Group"
       this.groupForm.method = "POST"
     },
     fillForm(group) {
-      this.groupForm.username = user.username;
-      this.groupForm.password = user.password;      
+      this.groupForm.name = group.name;      
+      this.groupForm.role = group.role.id;
       this.groupForm.title = "Update Group";
       this.groupForm.method = "PUT";
       this.groupForm.groupID = group.id
     },
     onSubmit(evt) {
       evt.preventDefault();
-      this.$refs.userModal.hide();            
+      this.$refs.groupModal.hide();            
       const payload = {
-        name: this.groupForm.username,
-        password: this.groupForm.username,
-        group_id: this.groupForm.group
+        name: this.groupForm.name,
       };
       if (this.groupForm.method == 'POST') {
-        this.addUser(payload);
+        this.addGroup(payload);
       }
       else if (this.groupForm.method == 'PUT') {        
-        this.updateUser(this.groupForm.userID, payload)
+        this.updateGroup(this.groupForm.groupID, payload)
       }
       this.initForm();
     },
     onReset(evt) {
       evt.preventDefault();
-      this.$refs.userModal.hide();
+      this.$refs.groupModal.hide();
       this.initForm();
     }
   },
-  created() {    
+  created() {
     this.getGroups();    
+    this.getRoles();
   }
 };
 </script>

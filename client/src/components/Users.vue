@@ -1,13 +1,19 @@
 <template>
-  <div class="container">
+  <div class="container-fluid">
+    <navbar></navbar>
     <div class="row">
-      <div class="col-sm-10">
+      <div class="col text-center">
         <h1>Users</h1>
         <hr />
         <br />
         <br />
-        <alert :message=message v-if="showMessage"></alert>
-        <button type="button" class="btn btn-success btn-sm" @click="initForm()" v-b-modal.user-modal>Add User</button>
+        <alert :message="message" v-if="showMessage"></alert>
+        <button
+          type="button"
+          class="btn btn-success btn-sm"
+          @click="initForm()"
+          v-b-modal.user-modal
+        >Add User</button>
         <br />
         <br />
         <table class="table table-hover">
@@ -26,8 +32,17 @@
               <td v-else></td>
               <td v-if="user.role !== null">{{ user.role.name }}</td>
               <td>
-                <button type="button" class="btn btn-warning btn-sm" @click="fillForm(user)" v-b-modal.user-modal>Update</button>
-                <button type="button" class="btn btn-danger btn-sm" @click="onDeleteUser(user)">Delete</button>
+                <button
+                  type="button"
+                  class="btn btn-warning btn-sm float-right"
+                  @click="fillForm(user)"
+                  v-b-modal.user-modal
+                >Update</button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm float-right"
+                  @click="onDeleteUser(user)"
+                >Delete</button>
               </td>
             </tr>
           </tbody>
@@ -79,14 +94,16 @@
 
 <script>
 import axios from "axios";
-import Alert from './Alert.vue';
+import Alert from "./Alert.vue";
+import NavBar from "./NavBar.vue";
 export default {
   components: {
     alert: Alert,
+    navbar: NavBar
   },
   data() {
     return {
-      message: '',
+      message: "",
       showMessage: false,
       users: [],
       groups: [],
@@ -112,7 +129,7 @@ export default {
         .then(res => {
           this.users = res.data.users;
         })
-        .catch(error => {          
+        .catch(error => {
           console.error(error);
         });
     },
@@ -140,33 +157,33 @@ export default {
           console.error(error);
         });
     },
-    getGroupsSelector() {        
-        this.groupsSelector.push({'value': null, 'text': 'Select'});
-        for (let i = 0; i < this.groups.length; i++) {
-            let option = {};
-            for (let key in this.groups[i]) {                
-              if (key == "id") {
-                option["value"] = this.groups[i][key];
-              } else if (key == "name") {
-                option["text"] = this.groups[i][key];
-              }
-            }            
-            this.groupsSelector.push(option);
-          }          
+    getGroupsSelector() {
+      this.groupsSelector.push({ value: null, text: "Select" });
+      for (let i = 0; i < this.groups.length; i++) {
+        let option = {};
+        for (let key in this.groups[i]) {
+          if (key == "id") {
+            option["value"] = this.groups[i][key];
+          } else if (key == "name") {
+            option["text"] = this.groups[i][key];
+          }
+        }
+        this.groupsSelector.push(option);
+      }
     },
-    getRolesSelector() {        
-        this.rolesSelector.push({'value': null, 'text': 'Select'});
-        for (let i = 0; i < this.roles.length; i++) {
-            let option = {};
-            for (let key in this.roles[i]) {                
-              if (key == "id") {
-                option["value"] = this.roles[i][key];
-              } else if (key == "name") {
-                option["text"] = this.roles[i][key];
-              }
-            }            
-            this.rolesSelector.push(option);
-          }          
+    getRolesSelector() {
+      this.rolesSelector.push({ value: null, text: "Select" });
+      for (let i = 0; i < this.roles.length; i++) {
+        let option = {};
+        for (let key in this.roles[i]) {
+          if (key == "id") {
+            option["value"] = this.roles[i][key];
+          } else if (key == "name") {
+            option["text"] = this.roles[i][key];
+          }
+        }
+        this.rolesSelector.push(option);
+      }
     },
     addUser(payload) {
       const path = "http://localhost:5000/users";
@@ -210,7 +227,7 @@ export default {
           this.getUsers();
         });
     },
-    onDeleteUser(user){
+    onDeleteUser(user) {
       this.removeUser(user.id);
     },
     initForm() {
@@ -218,8 +235,8 @@ export default {
       this.userForm.password = "";
       this.userForm.group = null;
       this.userForm.role = null;
-      this.userForm.title = "Add User"
-      this.userForm.method = "POST"
+      this.userForm.title = "Add User";
+      this.userForm.method = "POST";
     },
     fillForm(user) {
       this.userForm.username = user.username;
@@ -227,21 +244,20 @@ export default {
       this.userForm.group = user.group.id;
       this.userForm.title = "Update User";
       this.userForm.method = "PUT";
-      this.userForm.userID = user.id
+      this.userForm.userID = user.id;
     },
     onSubmit(evt) {
       evt.preventDefault();
-      this.$refs.userModal.hide();            
+      this.$refs.userModal.hide();
       const payload = {
         username: this.userForm.username,
         password: this.userForm.username,
         group_id: this.userForm.group
       };
-      if (this.userForm.method == 'POST') {
+      if (this.userForm.method == "POST") {
         this.addUser(payload);
-      }
-      else if (this.userForm.method == 'PUT') {        
-        this.updateUser(this.userForm.userID, payload)
+      } else if (this.userForm.method == "PUT") {
+        this.updateUser(this.userForm.userID, payload);
       }
       this.initForm();
     },
