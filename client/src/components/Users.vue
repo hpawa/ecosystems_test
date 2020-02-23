@@ -18,7 +18,7 @@
             :options="groupsSelector"
             @change="getUsers()"
           ></b-form-select>
-          <label class="mr-sm-2" for="filter-role">Role</label>          
+          <label class="mr-sm-2" for="filter-role">Role</label>
           <b-form-select
             id="filter-role"
             class="mr-2"            
@@ -26,8 +26,10 @@
             :options="rolesSelector"
             @change="getUsers()"
           ></b-form-select>
-          <b-form-input                        
-            placeholder="Search username"
+          <label class="mr-sm-2" for="filter-username">Username</label>
+          <b-form-input
+            id="filter-username"
+            placeholder="Search"
             v-model="params.username"
             @input="getUsers()"
           ></b-form-input>
@@ -180,6 +182,7 @@ export default {
         });
     },
     getGroupsSelector() {
+      this.groupsSelector = [];
       this.groupsSelector.push({ value: null, text: "Select" });
       for (let i = 0; i < this.groups.length; i++) {
         let option = {};
@@ -194,6 +197,7 @@ export default {
       }
     },
     getRolesSelector() {
+      this.rolesSelector = [];
       this.rolesSelector.push({ value: null, text: "Select" });
       for (let i = 0; i < this.roles.length; i++) {
         let option = {};
