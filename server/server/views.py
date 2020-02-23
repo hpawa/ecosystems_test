@@ -23,7 +23,7 @@ def all_users():
             if order_by:
                 users = users.order_by(order_by)
             response_object['users'] = UserSchema(many=True).dump(users.all())
-        if request.method == 'POST':
+        if request.method == 'POST':            
             new_user = UserSchema().load(request.get_json())
             db.session.add(new_user)
             db.session.commit()

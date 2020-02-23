@@ -18,12 +18,6 @@ def after_create(target, connection, **kw):
 
 event.listen(Role.__table__, "after_create", after_create)
 
-# @event.listens_for(Role.__table__, 'after_create', propagate=True)
-# def init_roles(*args, **kwargs):    
-#     db.session.add(models.Role(name='employye'))
-#     db.session.add(models.Role(name='admin'))    
-#     db.session.commit()
-
 class Group(db.Model):
     __tablename__ = 'groups'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
