@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from server import app
-from .models import *
+from .models import User, Group, Role, UserSchema, GroupSchema, RoleSchema, db
 
 
 @app.route('/users', methods=['GET', 'POST'])
