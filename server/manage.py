@@ -1,4 +1,5 @@
 from server import app
 from server import manager
 
-manager.run()
+if __name__ == '__main__':
+    manager.run()

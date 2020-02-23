@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
-from flask_script import Manager
+from flask_script import Manager, Command
 
 
 
@@ -15,5 +15,12 @@ from server import models
 from server import views
 migrate = Migrate(app, db)
 manager = Manager(app)
-manager.add_command('db', MigrateCommand)
+#manager.add_command('db', MigrateCommand)
 CORS(app)
+
+class InitDb(Command):
+    def run(self):
+        db.create_all()
+        return 'success init'
+
+manager.add_command('init_db', InitDb())        
