@@ -71,7 +71,7 @@ def all_groups():
                 groups = groups.filter_by(role_id=role)
             if order_by:
                 groups = groups.order_by(order_by)
-            response_object['groups'] = GroupSchema(many=True).dump(groups)
+            response_object['groups'] = GroupSchema(many=True).dump(groups.all())
         if request.method == 'POST':
             new_group = GroupSchema().load(request.get_json())
             db.session.add(new_group)
@@ -109,13 +109,41 @@ def all_roles():
     response_object = {}
     try:
         if request.method == 'GET':
-            roles = Role.query.all()
-            response_object['roles'] = RoleSchema(many=True).dump(roles)
+            roles = Role.query.filter()
+            # filters
+            name = request.args.get('name', None)            
+            order_by = request.args.get('order_by', None)
+            if name:
+                roles = roles.filter(Role.name.startswith(name))            
+            if order_by:
+                roles = roles.order_by(order_by)
+            response_object['roles'] = RoleSchema(many=True).dump(roles.all())
         if request.method == 'POST':
             new_role = RoleSchema().load(request.get_json())
             db.session.add(new_role)
             db.session.commit()
             response_object['message'] = f'Role {new_role.name} created'
+    except Exception as e:
+        response_object['message'] = str(e)
+    return jsonify(response_object)
+
+@app.route('/roles/<role_id>', methods=['GET', 'PUT', 'DELETE'])
+def single_role(role_id):
+    response_object = {}
+    try:
+        role = Role.query.filter_by(id=role_id)
+        if request.method == 'GET':
+            response_object = RoleSchema().dump(role.first())
+        if request.method == 'PUT':
+            post_data = request.get_json()
+            role.update(post_data)
+            db.session.commit()
+            response_object['message'] = f'Role {role.first().name} updated'
+        if request.method == 'DELETE':
+            role_name = role.first().name
+            role.delete()
+            db.session.commit()
+            response_object['message'] = f'Group {role_name} delete'
     except Exception as e:
         response_object['message'] = str(e)
     return jsonify(response_object)

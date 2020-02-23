@@ -272,6 +272,7 @@ export default {
       axios
         .put(path, { group_id: this.updGroupForm.group_id })
         .then(res => {
+          this.updGroupForm.user_id = null,
           this.getGroups();
           this.message = res.data.message;
           this.showMessage = true;

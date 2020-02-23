@@ -15,7 +15,6 @@ from server import models
 from server import views
 migrate = Migrate(app, db)
 manager = Manager(app)
-#manager.add_command('db', MigrateCommand)
 CORS(app)
 
 class InitDb(Command):

@@ -42,7 +42,7 @@ class User(db.Model):
 
 class RoleSchema(ma.ModelSchema):
     users = fields.Nested(lambda: UserSchema(
-        many=True, only=('id', 'username')))
+        many=True, only=('id', 'username', 'group')))
     groups = fields.Nested(lambda: GroupSchema(many=True, only=('id', 'name')))
 
     class Meta:
