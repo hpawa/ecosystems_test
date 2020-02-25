@@ -18,13 +18,21 @@
             :options="rolesSelector"
             @change="getGroups()"
           ></b-form-select>
+          <label class="mr-sm-2" for="filter-orderby">Order by</label>
+          <b-form-select
+            id="filter-orderby"
+            class="mr-2"            
+            v-model="params.order_by"
+            :options="paramOrder"
+            @change="getGroups()"
+          ></b-form-select>
           <label class="mr-sm-2" for="filter-name">Group name</label>
           <b-form-input
             id="filter-name"
             placeholder="Search"
             v-model="params.name"
             @input="getGroups()"
-          ></b-form-input>
+          ></b-form-input>          
         </b-form>
         <br />
         <br />
@@ -115,8 +123,9 @@ export default {
         name: null,
         group: null,
         role: null,
-        order: null
+        order_by: 'id'
       },
+      paramOrder: ['id', 'name', 'role_id'],
       showMessage: false,
       users: [],
       groups: [],

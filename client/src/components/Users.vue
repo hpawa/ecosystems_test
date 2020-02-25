@@ -26,13 +26,21 @@
             :options="rolesSelector"
             @change="getUsers()"
           ></b-form-select>
+          <label class="mr-sm-2" for="filter-orderby">Order by</label>
+          <b-form-select
+            id="filter-orderby"
+            class="mr-2"            
+            v-model="params.order_by"
+            :options="paramOrder"
+            @change="getUsers()"
+          ></b-form-select>
           <label class="mr-sm-2" for="filter-username">Username</label>
           <b-form-input
             id="filter-username"
             placeholder="Search"
             v-model="params.username"
             @input="getUsers()"
-          ></b-form-input>
+          ></b-form-input>          
         </b-form>
         <br />
         <br />
@@ -123,14 +131,15 @@ export default {
         username: null,
         group: null,
         role: null,
-        order: null
+        order_by: 'id'
       },
+      paramOrder: ['id', 'username', 'role_id', 'group_id'],
       showMessage: false,
       users: [],
       groups: [],
       roles: [],
       groupsSelector: [],
-      rolesSelector: [],
+      rolesSelector: [],      
       userForm: {
         userID: null,
         username: "",

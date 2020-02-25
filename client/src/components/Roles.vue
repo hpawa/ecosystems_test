@@ -10,7 +10,15 @@
         <alert :message="message" v-if="showMessage"></alert>
         <b-button variant="success" @click="initForm()" v-b-modal.role-modal>Add Role</b-button>
         <b-form inline class="float-right">
-        <label class="mr-sm-2" for="filter-name">Role name</label>
+          <label class="mr-sm-2" for="filter-orderby">Order by</label>
+          <b-form-select
+            id="filter-orderby"
+            class="mr-2"
+            v-model="params.order_by"
+            :options="paramOrder"
+            @change="getRoles()"
+          ></b-form-select>
+          <label class="mr-sm-2" for="filter-name">Role name</label>
           <b-form-input
             id="filter-name"
             placeholder="Search"
@@ -85,12 +93,15 @@
         </b-input-group-append>
       </b-input-group>
       <label class="mr-sm-2" for="users-list">Users list</label>
-      <b-table :id="'users-list'" hover :items="usersRole" :fields="[{'username': 'Username'}, {'group.name': 'Group'}]">
-      </b-table>
-      <br/>
+      <b-table
+        :id="'users-list'"
+        hover
+        :items="usersRole"
+        :fields="[{'username': 'Username'}, {'group.name': 'Group'}]"
+      ></b-table>
+      <br />
       <label class="mr-sm-2" for="groups-list">Groups list</label>
-      <b-table :id="'groups-list'" hover :items="groupsRole" :fields="[{'name': 'Name'}]">
-      </b-table>
+      <b-table :id="'groups-list'" hover :items="groupsRole" :fields="[{'name': 'Name'}]"></b-table>
     </b-modal>
   </div>
 </template>
@@ -109,7 +120,7 @@ export default {
       updRoleForm: {
         user_id: null,
         group_id: null,
-        role_id: null, 
+        role_id: null
       },
       usersSelector: [],
       groupsSelector: [],
@@ -117,8 +128,10 @@ export default {
       groupsRole: [],
       message: "",
       params: {
-        'name': null
+        name: null,
+        order_by: 'id'
       },
+      paramOrder: ['id', 'name'],
       showMessage: false,
       roles: [],
       groups: [],
@@ -135,7 +148,7 @@ export default {
       const path = "http://localhost:5000/users";
       axios({
         method: "GET",
-        url: path,        
+        url: path
       })
         .then(res => {
           this.users = res.data.users;
@@ -148,10 +161,10 @@ export default {
     getRoles() {
       const path = "http://localhost:5000/roles";
       axios({
-        method: 'GET',
+        method: "GET",
         url: path,
         params: this.params
-      })        
+      })
         .then(res => {
           this.roles = res.data.roles;
         })
@@ -288,8 +301,7 @@ export default {
       axios
         .put(path, { role_id: this.updRoleForm.role_id })
         .then(res => {
-          this.updRoleForm.user_id = null,
-          this.getRoles();
+          (this.updRoleForm.user_id = null), this.getRoles();
           this.message = res.data.message;
           this.showMessage = true;
           this.$refs.roleDetailModal.hide();
@@ -305,8 +317,7 @@ export default {
       axios
         .put(path, { role_id: this.updRoleForm.role_id })
         .then(res => {
-          this.updRoleForm.group_id = null,
-          this.getRoles();
+          (this.updRoleForm.group_id = null), this.getRoles();
           this.message = res.data.message;
           this.showMessage = true;
           this.$refs.roleDetailModal.hide();
@@ -316,7 +327,7 @@ export default {
           this.getRoles();
           this.$refs.roleDetailModal.hide();
         });
-    },
+    }
   },
   created() {
     this.getUsers();
